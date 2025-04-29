@@ -9,6 +9,11 @@ export async function middleware(req: NextRequest) {
   });
   const path = req.nextUrl.pathname;
 
+  // Debug logs (these will show up in server logs)
+  console.log(`Middleware for path: ${path}`);
+  console.log(`Token present: ${!!token}`);
+  console.log(`Token role: ${token?.role}`);
+
   // If user is not authenticated, redirect to sign-in page for protected routes
   if (
     !token &&
@@ -21,6 +26,10 @@ export async function middleware(req: NextRequest) {
 
   // For /admin routes, only allow ADMIN role
   if (path.startsWith("/admin") && token?.role !== "ADMIN") {
+    // Log the issue to better understand the problem
+    console.log(`Unauthorized access to admin route: ${path}`);
+    console.log(`User role: ${token?.role}`);
+
     // Redirect users without admin role to the unauthorized page
     return NextResponse.redirect(new URL("/unauthorized", req.url));
   }
@@ -47,9 +56,12 @@ export async function middleware(req: NextRequest) {
 // Specify which routes the middleware applies to
 export const config = {
   matcher: [
+    "/admin",
     "/admin/:path*",
+    "/artist-dashboard",
+    "/artist-dashboard/:path*",
     "/artist/:path*",
-    "/dashboard/:path*",
     "/dashboard",
+    "/dashboard/:path*",
   ],
 };

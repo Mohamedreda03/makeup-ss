@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { useSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -31,6 +31,10 @@ export function UserButton() {
   const { data: session, status } = useSession();
   // استخدام التعريف المخصص للمستخدم
   const user = session?.user as CustomUser;
+
+  const handleSignOut = () => {
+    signOut({ callbackUrl: "/" });
+  };
 
   if (status === "loading") {
     return (
@@ -84,7 +88,11 @@ export function UserButton() {
         <DropdownMenuSeparator />
         {user.role === "ADMIN" && (
           <DropdownMenuItem asChild>
-            <Link href="/admin" className="w-full cursor-pointer">
+            <Link
+              href="/admin"
+              className="w-full cursor-pointer"
+              prefetch={true}
+            >
               <UserCircle className="mr-2 h-4 w-4" />
               Admin Dashboard
             </Link>
@@ -112,13 +120,14 @@ export function UserButton() {
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link
-            href="/api/auth/signout"
-            className="w-full cursor-pointer text-red-500 focus:text-red-500"
+          <Button
+            onClick={handleSignOut}
+            variant="ghost"
+            className="w-full cursor-pointer text-red-500 hover:bg-red-50 hover:text-red-600 justify-start font-medium"
           >
             <LogOut className="mr-2 h-4 w-4" />
             Sign out
-          </Link>
+          </Button>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
